@@ -19,6 +19,6 @@ public class Character : MonoBehaviour
     protected virtual void Death()
     {
         if(_health.Current <= 0)
-            Destroy(this.gameObject);
+            Destroy(transform.parent.gameObject);
     }
 }

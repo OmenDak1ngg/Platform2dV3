@@ -4,6 +4,7 @@ using UnityEngine;
 abstract public class HealthDisplayer : MonoBehaviour
 {
     [SerializeField] protected Health Health;
+    [SerializeField] private Transform reference;
 
     private void OnEnable()
     {
@@ -18,6 +19,11 @@ abstract public class HealthDisplayer : MonoBehaviour
     protected virtual void Start()
     {
         StartCoroutine(UpdateHealthDisplay());
+    }
+
+    private void Update()
+    {
+        transform.position = reference.position;
     }
 
     protected void StartUpdatetingHealth()

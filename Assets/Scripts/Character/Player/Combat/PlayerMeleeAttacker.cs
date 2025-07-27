@@ -7,7 +7,7 @@ public class PlayerMeleeAttacker : MonoBehaviour
     [SerializeField] private Transform _reference;
     [SerializeField] private LayerMask _enemyLayerMask;
 
-    public void OnAttack132()
+    public void OnAttack()
     {
         Collider2D hittedEnemy = Physics2D.OverlapCircle(_reference.position, _attackRadius, _enemyLayerMask);
 
