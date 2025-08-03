@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
@@ -12,20 +11,16 @@ public class VampireCircle : MonoBehaviour
     [SerializeField] private LayerMask _enemyLayerMask;
 
     [SerializeField] private int _lifeDrainDamage;
-
     [SerializeField] private float _lifeDrainCooldown = 4f;
-
-    [Header("lifeDrainPerInterval in seconds")]
     [SerializeField] private float _lifeDrainInterval;
 
-    public event Action StartedDrainLife;
+    public event Action LifeDrainEnded;
+    public float LifeDrainCooldown => _lifeDrainCooldown;
 
     private bool _lifeDrainEnded;
 
     private float _currentLifeDrainDuration;
     private float _lifeDrainDuration = 6f;
-
-    public float LifeDrainCooldown => _lifeDrainCooldown;
 
     private float _startAlpha = 0.3f;
     private float _maxAlpha = 1f;
@@ -36,11 +31,11 @@ public class VampireCircle : MonoBehaviour
 
     private void Start()
     {
-
         _lifeDrainEnded = true;
         _currentLifeDrainDuration = _lifeDrainDuration;
         _collider = GetComponent<CircleCollider2D>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
+
         ChangeAlpha(_startAlpha);
     }
 
@@ -59,8 +54,8 @@ public class VampireCircle : MonoBehaviour
         if (_lifeDrainEnded == false)
             return;
 
-        StartedDrainLife?.Invoke();
         _collider.gameObject.SetActive(true);
+
         StartCoroutine(StartLifeDrain());
     }
 
@@ -105,7 +100,10 @@ public class VampireCircle : MonoBehaviour
 
     private IEnumerator ReloadLifeDrain()
     {
+        LifeDrainEnded?.Invoke();
+
         yield return new WaitForSeconds(LifeDrainCooldown);
+        
         _lifeDrainEnded = true;
     }
 

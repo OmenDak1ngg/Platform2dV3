@@ -6,7 +6,8 @@ using UnityEngine.UI;
 public class CooldownDisplayerVampireCircle : MonoBehaviour
 {
     [SerializeField] private VampireCircle _vampireCircle;
-    [SerializeField] private float _delta = 10f;
+
+    private float _delta;
 
     private float _startValue;
     private float _currentValue;
@@ -22,19 +23,20 @@ public class CooldownDisplayerVampireCircle : MonoBehaviour
         _slider.maxValue = _startValue;
 
         _currentValue = _startValue;
-
         
         _slider.value = _startValue;
+
+        _delta = _startValue / _vampireCircle.LifeDrainCooldown;
     }
 
     private void OnEnable()
     {
-        _vampireCircle.StartedDrainLife += StartShowingCooldown;
+        _vampireCircle.LifeDrainEnded += StartShowingCooldown;
     }
 
     private void OnDisable()
     {
-        _vampireCircle.StartedDrainLife -= StartShowingCooldown;    
+        _vampireCircle.LifeDrainEnded -= StartShowingCooldown;    
     }
 
     private void StartShowingCooldown()
@@ -46,9 +48,9 @@ public class CooldownDisplayerVampireCircle : MonoBehaviour
     {
         _currentValue = _startValue;
 
-        while(_slider.value != _vampireCircle.LifeDrainCooldown)
+        while(_currentValue  != 0)
         {
-            _slider.value -= Mathf.MoveTowards(_currentValue, _vampireCircle.LifeDrainCooldown, _delta);
+            _currentValue = Mathf.MoveTowards(_currentValue, 0, _delta * Time.deltaTime);
             _slider.value = _currentValue;
             yield return null;
         }
