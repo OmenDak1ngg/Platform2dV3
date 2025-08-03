@@ -7,7 +7,8 @@ public class InputReader : MonoBehaviour
 
     public event Action Jumped;
     public event Action Attacked;
-    
+    public event Action Vampired;
+
     public bool IsTryedToJump { get; private set; }
     public float Direction { get; private set; }
     
@@ -23,6 +24,11 @@ public class InputReader : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F))
         {
             Attacked?.Invoke();
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftAlt))
+        {
+            Vampired?.Invoke();
         }
     }
 
