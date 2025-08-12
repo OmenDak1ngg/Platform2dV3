@@ -1,5 +1,7 @@
+using NUnit.Framework;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
@@ -22,15 +24,22 @@ public class VampireCircle : MonoBehaviour
     private float _currentLifeDrainDuration;
     private float _lifeDrainDuration = 6f;
 
-    private float _startAlpha = 0.3f;
+    private float _startAlpha = 0f;
     private float _maxAlpha = 1f;
     private Color _currentColor;
+
+    private Collider2D[] _cachedColliders;
 
     private SpriteRenderer _spriteRenderer;
     private CircleCollider2D _collider;
 
+    private WaitForSeconds _tickInterval;
+
     private void Start()
     {
+        _cachedColliders = new Collider2D[10];
+
+        _tickInterval = new WaitForSeconds(_lifeDrainInterval);
         _lifeDrainEnded = true;
         _currentLifeDrainDuration = _lifeDrainDuration;
         _collider = GetComponent<CircleCollider2D>();
@@ -56,11 +65,11 @@ public class VampireCircle : MonoBehaviour
 
         _collider.gameObject.SetActive(true);
 
-        StartCoroutine(StartLifeDrain());
+        StartCoroutine(PerformLifeDrain());
     }
 
 
-    private IEnumerator StartLifeDrain()
+    private IEnumerator PerformLifeDrain()
     {
         _lifeDrainEnded = false;
 
@@ -68,7 +77,9 @@ public class VampireCircle : MonoBehaviour
 
         while(_currentLifeDrainDuration >= 0)
         {
-            yield return StartCoroutine(DrainLife());
+            DrainLife();
+
+            yield return _tickInterval;
 
             _currentLifeDrainDuration -= _lifeDrainInterval;
         }
@@ -80,22 +91,27 @@ public class VampireCircle : MonoBehaviour
         yield return StartCoroutine(ReloadLifeDrain());
     }
 
-    private IEnumerator DrainLife()
+    private void DrainLife()
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, _collider.radius * transform.localScale.x, _enemyLayerMask);
+        int collidersCount = Physics2D.OverlapCircleNonAlloc(transform.position, _collider.radius * transform.localScale.x, _cachedColliders, _enemyLayerMask);
 
-        if (colliders.Length == 0)
-            yield return null;
+        if (collidersCount == 0)
+            return;
 
-
-        foreach(Collider2D collider in colliders)
+        for (int i = 0; i < collidersCount; i++)
         {
-            Enemy enemy = collider.GetComponent<Enemy>();
-            enemy.Health.TakeDamage(_lifeDrainDamage);
-            _player.Health.TakeHeal(_lifeDrainDamage);
-        }
+            Collider2D collider = _cachedColliders[i];
 
-        yield return new WaitForSeconds(_lifeDrainInterval);
+            if (collider.TryGetComponent<Enemy>(out Enemy enemy) == false)
+                return;
+
+            if (enemy.Health.Current - _lifeDrainDamage < 0)
+                _player.Health.TakeHeal(enemy.Health.Current);
+            else
+                _player.Health.TakeHeal(_lifeDrainDamage);
+
+            enemy.Health.TakeDamage(_lifeDrainDamage);
+        }
     }
 
     private IEnumerator ReloadLifeDrain()

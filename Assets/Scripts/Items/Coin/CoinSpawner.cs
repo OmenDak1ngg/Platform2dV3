@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.iOS;
 using UnityEngine.Pool;
 
 public class CoinSpawner : MonoBehaviour
@@ -85,7 +86,7 @@ public class CoinSpawner : MonoBehaviour
             _pool.Release(coin);
             StartCoroutine(SpawnCoin());
         }
-    }
+    }   
 
     private void DestroyCoin(Coin coin)
     {

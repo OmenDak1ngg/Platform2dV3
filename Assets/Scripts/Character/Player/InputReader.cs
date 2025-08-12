@@ -4,6 +4,9 @@ using UnityEngine;
 public class InputReader : MonoBehaviour
 {
     private readonly string Horizontal = nameof(Horizontal);
+    private readonly KeyCode JumpKey = KeyCode.Space;
+    private readonly KeyCode AttackKey = KeyCode.F;
+    private readonly KeyCode VampireKey = KeyCode.LeftAlt;
 
     public event Action Jumped;
     public event Action Attacked;
@@ -14,19 +17,19 @@ public class InputReader : MonoBehaviour
     
     private void Update()
     {
-        Direction = Input.GetAxis("Horizontal");
+        Direction = Input.GetAxis(Horizontal);
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(JumpKey))
         {
            Jumped?.Invoke();
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(AttackKey))
         {
             Attacked?.Invoke();
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftAlt))
+        if (Input.GetKeyDown(VampireKey))
         {
             Vampired?.Invoke();
         }

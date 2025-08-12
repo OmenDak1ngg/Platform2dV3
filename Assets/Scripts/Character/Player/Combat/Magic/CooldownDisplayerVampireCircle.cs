@@ -7,9 +7,9 @@ public class CooldownDisplayerVampireCircle : MonoBehaviour
 {
     [SerializeField] private VampireCircle _vampireCircle;
 
-    private float _delta;
+    private float _delta = 1f;
 
-    private float _startValue;
+    private float _startValue = 1f;
     private float _currentValue;
 
     private Slider _slider;
@@ -17,13 +17,11 @@ public class CooldownDisplayerVampireCircle : MonoBehaviour
     private void Start()
     {
         _slider = GetComponent<Slider>();
-        
+
         _slider.minValue = 0f;
-        _startValue = _vampireCircle.LifeDrainCooldown;
-        _slider.maxValue = _startValue;
 
         _currentValue = _startValue;
-        
+
         _slider.value = _startValue;
 
         _delta = _startValue / _vampireCircle.LifeDrainCooldown;
