@@ -1,28 +1,21 @@
+using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
-[RequireComponent(typeof(Slider))]
-public class CooldownDisplayerVampireCircle : MonoBehaviour
+public class VampireCooldownListener : MonoBehaviour
 {
     [SerializeField] private VampireCircle _vampireCircle;
 
     private float _delta = 1f;
 
     private float _startValue = 1f;
-    private float _currentValue;
+    public float CurrentValue { get; private set; }
 
-    private Slider _slider;
+    public event Action UpdatedCooldown;
 
     private void Start()
     {
-        _slider = GetComponent<Slider>();
-
-        _slider.minValue = 0f;
-
-        _currentValue = _startValue;
-
-        _slider.value = _startValue;
+        CurrentValue = _startValue;
 
         _delta = _startValue / _vampireCircle.LifeDrainCooldown;
     }
@@ -44,12 +37,13 @@ public class CooldownDisplayerVampireCircle : MonoBehaviour
 
     private IEnumerator ShowCooldown()
     {
-        _currentValue = _startValue;
+        CurrentValue = _startValue;
 
-        while(_currentValue  != 0)
+        while(CurrentValue  != 0)
         {
-            _currentValue = Mathf.MoveTowards(_currentValue, 0, _delta * Time.deltaTime);
-            _slider.value = _currentValue;
+            CurrentValue = Mathf.MoveTowards(CurrentValue, 0, _delta * Time.deltaTime);
+            UpdatedCooldown?.Invoke();
+
             yield return null;
         }
     }
